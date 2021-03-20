@@ -1,7 +1,6 @@
 import mysql.connector
 import telegram
 import logging
-import telebot
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ReplyKeyboardMarkup, ForceReply
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext, MessageHandler, Filters, ConversationHandler
 bot=telegram.Bot(token='1672450404:AAGWI_wKkOk1b_snJVK01EYDMCKZbnclAQA')
