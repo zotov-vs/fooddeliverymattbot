@@ -1,9 +1,17 @@
+import mysql.connector
 import logging
 import dbworks
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ReplyKeyboardMarkup, ForceReply
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext, MessageHandler, Filters, ConversationHandler
 bot=telegram.Bot(token='1672450404:AAGWI_wKkOk1b_snJVK01EYDMCKZbnclAQA')
+mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="123567PRS",
+        database="deliveryfoodbotdb"
+        )
+mycursor = mydb.cursor()
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
@@ -38,7 +46,21 @@ def shop(update: Update, context: CallbackContext)-> int:
         chat_id=query.message.chat_id,
         message_id=query.message.message_id,
         reply_markup=reply_markup)
-        
+
+def shopsearch(usermessage,chatid):
+    query = "SELECT * FROM products WHERE Prod_Category LIKE %s"
+    mycursor.execute(query,("%" + usermessage + "%",))
+    for result in mycursor.fetchall():
+        for n in range(2,5):
+            if (n != 4):
+                bot.send_message(chatid,result[n])
+            else:
+                good = result[2]
+                keyboard =[[
+                    InlineKeyboardButton("Добавить в корзину", callback_data=str(good))]]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                bot.send_photo(chatid,result[n],reply_markup=reply_markup)
+                
 def cart(update: Update, context: CallbackContext)-> int:
     print('dsa')
 def order()-> None:
@@ -56,13 +78,13 @@ def button(update: Update, context: CallbackContext) -> int:
     if choice == str(cart):
         cart(update,context)
     if choice == 'Бакалея':
-        dbworks.shopsearch('Бакалея',chatid)
+        shopsearch('Бакалея',chatid)
     if choice == 'Мясо':
-        dbworks.shopsearch('Мясо',chatid)
+        shopsearch('Мясо',chatid)
     if choice == 'Рыба':
-        dbworks.shopsearch('Рыба',chatid)
+        shopsearch('Рыба',chatid)
     if choice == 'Молоко':
-        dbworks.shopsearch('Молоко',chatid)
+        shopsearch('Молоко',chatid)
     if choice == 'Назад':
         keyboard = [
         [InlineKeyboardButton("Перейти в магазин", callback_data=str(shop))],
@@ -77,10 +99,11 @@ def button(update: Update, context: CallbackContext) -> int:
         message_id=query.message.message_id,
         reply_markup=reply_markup)
     #if choice == str(good):
-     #   price = dbworks.show_price(call.data)
-      #  dbworks.addtocart(chatid,good,price)
-       # x = str(good) + '1 штука добавлена в корзину'
-        
+     #   price = dbworks.show_price()
+      #  dbworks.addtocart(chatid,,price)
+       # x = str() + '1 штука добавлена в корзину'
+        #bot.send_message(chatid,x)
+
 def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text("Напишите /start, чтобы начать работу с ботом.")
 
