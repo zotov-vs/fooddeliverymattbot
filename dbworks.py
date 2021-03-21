@@ -21,22 +21,7 @@ def userins(update,context):
     mycursor.execute(sql, val)
     mydb.commit()
     print(mycursor.rowcount, "record has been inserted.")
-    
-def shopsearch(usermessage,chatid) -> int:
-    keyboard = telebot.types.InlineKeyboardMarkup()
-    query = "SELECT * FROM products WHERE Prod_Category LIKE %s"
-    mycursor.execute(query,("%" + usermessage + "%",))
-    for result in mycursor.fetchall():
-        for n in range(2,5):
-            if (n != 4):
-                bot.send_message(chatid,result[n])
-            else:
-                good = result[2]
-                keyboard =[[
-                    InlineKeyboardButton("Добавить в корзину", callback_data=str(good))]]
-                reply_markup = InlineKeyboardMarkup(keyboard)
-                bot.send_photo(chatid,result[n],reply_markup=reply_markup)
-                
+                    
 def addtocart(id,item,price):
     query = "INSERT INTO cart VALUES(?,?,?)"
     mycursor.execute(query, (id,item,price))
@@ -50,13 +35,20 @@ def summary(id):
         ordsum += item[0]
     return ordsum
 
+def show_price(good):
+    query = "SELECT Prod_Price FROM products WHERE product =: Prod_Name"
+    mycursor.execute(query, {"Prod_Name" :product})
+    all = mycursor.fetchall()
+    lst = list()
+    for e in all:
+        e = e[0]
+        lst.append(e)
+    return lst[0]
+
 def empty_cart(id):
     query = "DELETE from cart WHERE user =:User_ID"
     mycursor.execute(query, {"User_ID" :id})
     mydb.commit()
 
 def location(id,loc):
-    query = "INSERT INTO orders(location) VALUES(?)"
-    query = "UPDATE orders SET location = (?) WHERE User_ID = (?)"
-    mycursor.execute(query,(loc,id))
-    mydb.commit()
+   print('dsd')
